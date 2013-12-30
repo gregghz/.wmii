@@ -49,8 +49,30 @@ wmiir write /colrules <<!
 
 # Tagging Rules
 wmiir write /tagrules <<!
-/MPlayer|VLC|Hangouts/ -> ~
+/MPlayer|Hangouts/ -> ~
 !
+
+volume_write() {
+    d=$(pwd)
+    cd ~/.wmii/cmds
+    ./volume.sh | wmiir write /rbar/ddd_volume
+    cd $d
+}
+
+volume_up() {
+    amixer set Master 2+
+    volume_write
+}
+
+volume_down() {
+    amixer set Master 2-
+    volume_write
+}
+
+volume_mute() {
+    amixer set Master toggle
+    volume_write
+}
 
 local_events() { true;}
 wi_runconf -s wmiirc_local
@@ -209,23 +231,17 @@ Key $MODKEY-Control-t # Toggle all other key bindings
 		wmiir xwrite /ctl grabmod Mod3;;
 	esac
 Key XF86AudioRaiseVolume
-	amixer set Master 2+
-	d=$(pwd)
-	cd ~/.wmii/cmds
-	./volume.sh | wmiir write /rbar/ddd_volume
-	cd $d
+	volume_up &
 Key XF86AudioLowerVolume
-	amixer set Master 2-
-	d=$(pwd)
-	cd ~/.wmii/cmds
-	./volume.sh | wmiir write /rbar/ddd_volume
-	cd $d
+	volume_down &
 Key XF86AudioMute
-	amixer set Master toggle
-	d=$(pwd)
-	cd ~/.wmii/cmds
-	./volume.sh | wmiir write /rbar/ddd_volume
-	cd $d
+	volume_mute &
+Key F12
+	volume_up &
+Key F11
+	volume_down &
+Key F10
+	volume_mute &
 Key XF86MonBrightnessDown
 	xbacklight -dec 7
 Key XF86Launch5
